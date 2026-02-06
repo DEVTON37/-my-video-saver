@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noon Universal Downloader - ดาวน์โหลดวิดีโอจากทุกเว็บไซต์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
+        body {
+            font-family: 'Kanit', sans-serif;
+            min-height: 100vh;
+            color: white;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .download-btn {
+            background: linear-gradient(90deg, #ff4b2b 0%, #ff416c 100%);
+            transition: all 0.3s ease;
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 65, 108, 0.3);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-4 min-h-screen">
+    <!-- Background Elements -->
+    <div class="bg-container">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+        <div id="floating-icons" class="floating-icons-wrapper"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="w-full max-w-4xl flex justify-between items-center mb-12">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-tr from-purple-600 to-blue-500 rounded-lg flex items-center justify-center animate-pulse">
+                <i class="fas fa-globe text-white"></i>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight">NOON <span class="text-blue-500">UNIVERSAL</span></h1>
+        </div>
+        <nav class="hidden md:flex gap-6 text-sm text-gray-400">
+            <a href="../movie-ui/index.html" class="hover:text-white transition">ดูหนังออนไลน์</a>
+            <a href="../vpn-website/index.html" class="hover:text-white transition">บริการ VPN</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="w-full max-w-2xl text-center">
+        <div class="mb-8">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">ดาวน์โหลดวิดีโอได้ <span class="text-blue-500">ทุกเว็บ</span></h2>
+            <p class="text-gray-400 text-lg">รองรับ Facebook, TikTok, IG, DailyMotion และอื่นๆ อีก 1,000+ เว็บไซต์ค่ะ ❤️</p>
+        </div>
+
+        <div class="glass-card p-6 md:p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+            <!-- Compatibility Badge -->
+            <div class="absolute top-0 right-0 bg-yellow-500/20 text-yellow-500 text-[10px] px-3 py-1 rounded-bl-xl border-b border-l border-white/10">
+                <i class="fas fa-shield-alt mr-1"></i> Universal Support
+            </div>
+
+            <div class="relative mb-4">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i id="platform-icon" class="fas fa-link text-blue-500 text-xl transition-all duration-300"></i>
+                </div>
+                <input type="text" id="video-url" 
+                    class="block w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition"
+                    placeholder="วางลิงก์วิดีโอ (YouTube, Facebook, TikTok, DailyMotion...)">
+            </div>
+
+            <!-- Supported Platforms Icons -->
+            <div class="flex justify-center flex-wrap gap-6 mb-6 text-gray-500 text-xl">
+                <i class="fab fa-youtube hover:text-red-500 transition-colors cursor-help" title="YouTube"></i>
+                <i class="fab fa-facebook hover:text-blue-600 transition-colors cursor-help" title="Facebook"></i>
+                <i class="fab fa-tiktok hover:text-pink-500 transition-colors cursor-help" title="TikTok"></i>
+                <i class="fab fa-instagram hover:text-purple-500 transition-colors cursor-help" title="Instagram"></i>
+                <i class="fab fa-twitter hover:text-blue-400 transition-colors cursor-help" title="X / Twitter"></i>
+                <i class="fas fa-play-circle hover:text-blue-500 transition-colors cursor-help" title="DailyMotion"></i>
+                <i class="fas fa-video hover:text-green-500 transition-colors cursor-help" title="Vimeo"></i>
+            </div>
+
+            <!-- Quality Selection -->
+            <div class="flex gap-4 mb-6">
+                <select id="video-quality" class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500/50">
+                    <option value="worst">เร็วที่สุด (ภาพไม่ค่อยชัด: เน้นความเร็วสูงสุด)</option>
+                    <option value="360">ความคมชัด 360p (เร็วมาก: ประหยัดเน็ต)</option>
+                    <option value="480">ความคมชัด 480p (เร็ว: คุณภาพปานกลาง)</option>
+                    <option value="720" selected>ความคมชัด 720p (แนะนำ: ชัดกำลังดีและเร็ว)</option>
+                    <option value="1080">ความคมชัด 1080p (ชัดมาก: ดาวน์โหลดช้ากว่า)</option>
+                    <option value="best">ชัดที่สุด (4K/8K: ช้าที่สุด)</option>
+                </select>
+            </div>
+
+            <button id="download-trigger" class="download-btn w-full py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 mb-4">
+                <i class="fas fa-download"></i>
+                เริ่มดาวน์โหลดเลยค่ะ
+            </button>
+
+            <div id="status-area" class="text-sm text-gray-400">
+                <p><i class="fas fa-info-circle mr-1"></i> รองรับความละเอียดสูงสุด 4K และ MP3 ค่ะ</p>
+            </div>
+
+            <!-- Progress Bar (Hidden by default) -->
+            <div id="progress-container" class="hidden mt-6 text-left">
+                <div class="flex justify-between mb-2 text-xs">
+                    <span id="progress-status">กำลังเตรียมการ...</span>
+                    <span id="progress-percent">0%</span>
+                </div>
+                <div class="w-full bg-white/10 rounded-full h-2 mb-4">
+                    <div id="progress-bar" class="bg-red-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+
+                <!-- Action Buttons after Success -->
+                <div id="success-actions" class="hidden flex flex-col gap-2 animate-bounce-short">
+                    <button id="open-folder-btn" class="w-full py-3 bg-blue-600/20 border border-blue-500/50 rounded-xl text-blue-400 text-sm font-medium hover:bg-blue-600/30 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-folder-open"></i> เปิดโฟลเดอร์ที่เก็บวิดีโอ
+                    </button>
+                    <a id="browser-download-link" href="#" class="w-full py-3 bg-green-600/20 border border-green-500/50 rounded-xl text-green-400 text-sm font-medium hover:bg-green-600/30 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-save"></i> บันทึกลงเครื่อง (Downloads)
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+            <div class="glass-card p-6 rounded-2xl">
+                <i class="fas fa-bolt text-yellow-400 text-2xl mb-3"></i>
+                <h3 class="font-bold mb-1">เร็วแรง</h3>
+                <p class="text-xs text-gray-500">ดาวน์โหลดได้ไวทันใจ ไม่ต้องรอนานค่ะ</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl">
+                <i class="fas fa-shield-heart text-green-400 text-2xl mb-3"></i>
+                <h3 class="font-bold mb-1">ปลอดภัย</h3>
+                <p class="text-xs text-gray-500">ไม่มีไวรัสหรือมัลแวร์แน่นอน นุ่นรับประกันค่ะ</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl">
+                <i class="fas fa-magic text-purple-400 text-2xl mb-3"></i>
+                <h3 class="font-bold mb-1">ใช้ง่าย</h3>
+                <p class="text-xs text-gray-500">แค่ปุ่มเดียว จบ ครบ ทุกขั้นตอนค่ะ</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-20 text-center text-gray-500 text-xs">
+        <p>© 2026 NOON DOWNLOADER. สร้างสรรค์ด้วยความตั้งใจโดย นุ่น ค่ะ ❤️</p>
+    </footer>
+
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
