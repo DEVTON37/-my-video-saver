@@ -51,8 +51,8 @@ def clean_error_message(msg):
         return "ขอโทษนะคะคุณพี่ ลิงก์นี้ไม่ใช่ลิงก์วิดีโอที่นุ่นรู้จักค่ะ รบกวนตรวจสอบว่าเป็นลิงก์จาก YouTube, Facebook, TikTok หรือเว็บวิดีโออื่นๆ หรือเปล่านะคะ"
     if "403" in msg or "Forbidden" in msg:
         return "เข้าถึงไม่ได้ (403 Forbidden) เว็บไซต์นี้บล็อกการดาวน์โหลดจากเซิร์ฟเวอร์ค่ะ คุณพี่ลองเปลี่ยนความละเอียดเป็น 360p หรือ 480p ดูนะคะ"
-    if "Sign in" in msg or "login" in msg.lower():
-        return "วิดีโอนี้ต้องเข้าสู่ระบบก่อนถึงจะดูได้ (เช่น วิดีโอส่วนตัว หรือจำกัดอายุ) นุ่นเลยโหลดให้ไม่ได้ค่ะ"
+    if "Sign in" in msg or "login" in msg.lower() or "confirm you're not a bot" in msg.lower():
+        return "YouTube บล็อกการเข้าถึงจากเซิร์ฟเวอร์ชั่วคราวค่ะ (Bot Detection) นุ่นกำลังปรับจูนระบบให้ใหม่นะคะ คุณพี่ลองกดใหม่อีกครั้ง หรือลองเปลี่ยนลิงก์อื่นดูก่อนนะคะ"
     if "ffmpeg" in msg.lower():
         return "ระบบประมวลผลวิดีโอ (FFmpeg) มีปัญหาเล็กน้อยค่ะ นุ่นกำลังพยายามแก้ไขให้นะคะ"
     
@@ -62,7 +62,7 @@ def get_ydl_opts(f_str, is_bilibili=False):
     headers = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'Accept-Language': 'en-US,en;q=0.9,th;q=0.8',
-        'Referer': 'https://www.bilibili.com/' if is_bilibili else 'https://www.google.com/',
+        'Referer': 'https://www.bilibili.com/' if is_bilibili else 'https://www.youtube.com/',
     }
     
     opts = {
@@ -77,7 +77,7 @@ def get_ydl_opts(f_str, is_bilibili=False):
         'fragment_retries': 5,
         'retry_sleep': 2,
         'overwrites': True,
-        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
         'http_headers': headers,
         'logger': MyLogger(),
         'merge_output_format': 'mp4',
@@ -92,7 +92,8 @@ def get_ydl_opts(f_str, is_bilibili=False):
     # Cloud-friendly extractor args
     opts['extractor_args'] = {
         'youtube': {
-            'player_client': ['android', 'web'],
+            'player_client': ['android', 'ios'],
+            'player_skip': ['webpage', 'configs'],
         }
     }
     
