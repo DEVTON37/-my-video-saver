@@ -62,7 +62,7 @@ def get_ydl_opts(f_str, is_bilibili=False):
     headers = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'Accept-Language': 'en-US,en;q=0.9,th;q=0.8',
-        'Referer': 'https://www.bilibili.com/' if is_bilibili else 'https://www.youtube.com/',
+        'Referer': 'https://www.bilibili.com/' if is_bilibili else 'https://www.google.com/',
     }
     
     opts = {
@@ -83,23 +83,33 @@ def get_ydl_opts(f_str, is_bilibili=False):
         'merge_output_format': 'mp4',
     }
     
+    # ตรวจสอบว่าเป็นเครื่องคุณพี่ หรือเป็นบน Render (Cloud)
+    is_render = os.environ.get('RENDER') == 'true'
+
+    # ถ้าเป็นเครื่องคุณพี่ (Local) เราจะไม่ใช้คุกกี้ค่ะ เพราะมันจะฟ้อง Error ถ้าเปิด Chrome ค้างไว้
+    # นุ่นจะใช้การจำลองเป็น iOS แทน ซึ่งโหลดได้เหมือนกันและไม่พังค่ะ
+    if is_render:
+        opts['impersonate'] = 'chrome-110'
+        opts['extractor_args'] = {
+            'youtube': {
+                'player_client': ['android', 'ios'],
+                'player_skip': ['webpage', 'configs'],
+            }
+        }
+    else:
+        # วิธีเก่าที่เคยใช้ได้บนเครื่องคุณพี่ค่ะ
+        opts['extractor_args'] = {
+            'youtube': {
+                'player_client': ['ios', 'android'],
+                'player_skip': ['webpage', 'configs'],
+            }
+        }
+
     # Add postprocessors for merging or converting
     opts['postprocessors'] = [{
         'key': 'FFmpegVideoConvertor',
         'preferedformat': 'mp4',
     }]
-    
-    # Cloud-friendly extractor args
-    opts['extractor_args'] = {
-        'youtube': {
-            'player_client': ['ios', 'android', 'web'],
-            'player_skip': ['webpage', 'configs'],
-        }
-    }
-    
-    # Advanced bot detection bypass: use cookies if available or impersonate
-    # For Render, we will try to use a more stable impersonation
-    opts['impersonate'] = 'chrome-110' # Specific version can sometimes help
     
     return opts
 
