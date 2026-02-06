@@ -7,6 +7,12 @@ import re
 import traceback
 import logging
 
+try:
+    import curl_cffi
+    HAS_CURL_CFFI = True
+except ImportError:
+    HAS_CURL_CFFI = False
+
 import static_ffmpeg
 static_ffmpeg.add_paths()
 
@@ -89,13 +95,18 @@ def get_ydl_opts(f_str, is_bilibili=False):
     # ถ้าเป็นเครื่องคุณพี่ (Local) เราจะไม่ใช้คุกกี้ค่ะ เพราะมันจะฟ้อง Error ถ้าเปิด Chrome ค้างไว้
     # นุ่นจะใช้การจำลองเป็น iOS แทน ซึ่งโหลดได้เหมือนกันและไม่พังค่ะ
     if is_render:
-        opts['impersonate'] = 'chrome-110'
+        # บน Render เราจะพยายามใช้โหมดจำลองที่เสถียรที่สุดค่ะ
+        # นุ่นเพิ่ม curl_cffi ใน requirements แล้ว น่าจะใช้ chrome-110 ได้ลื่นๆ
+        # แต่ถ้ามีปัญหา นุ่นจะให้มันข้ามไปใช้โหมดปกติแทน ไม่ให้หน้าเว็บค้างค่ะ
         opts['extractor_args'] = {
             'youtube': {
-                'player_client': ['android', 'ios'],
+                'player_client': ['ios', 'android'],
                 'player_skip': ['webpage', 'configs'],
             }
         }
+        # ลองใส่ impersonate ถ้ามี library รองรับค่ะ
+        if HAS_CURL_CFFI:
+            opts['impersonate'] = 'chrome-110'
     else:
         # วิธีเก่าที่เคยใช้ได้บนเครื่องคุณพี่ค่ะ
         opts['extractor_args'] = {

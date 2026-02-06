@@ -3,3 +3,4 @@ Flask-Cors==4.0.0
 yt-dlp>=2025.1.15
 static-ffmpeg==2.5
 gunicorn==21.2.0
+curl_cffi>=0.7.0
