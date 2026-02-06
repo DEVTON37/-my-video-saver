@@ -92,10 +92,14 @@ def get_ydl_opts(f_str, is_bilibili=False):
     # Cloud-friendly extractor args
     opts['extractor_args'] = {
         'youtube': {
-            'player_client': ['android', 'ios'],
+            'player_client': ['ios', 'android', 'web'],
             'player_skip': ['webpage', 'configs'],
         }
     }
+    
+    # Advanced bot detection bypass: use cookies if available or impersonate
+    # For Render, we will try to use a more stable impersonation
+    opts['impersonate'] = 'chrome-110' # Specific version can sometimes help
     
     return opts
 
